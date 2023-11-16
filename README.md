@@ -131,4 +131,4 @@ Certainly! Here are examples of how to call the API routes mentioned in the READ
 
 Please note that the actual URL (`http://localhost:8000/`) and the request payloads should be adjusted based on your specific setup and requirements.
 
-(Edit for redeploy)
+(Edit for deploy)
