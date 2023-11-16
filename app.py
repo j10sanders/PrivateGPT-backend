@@ -8,6 +8,8 @@ import os
 from fastapi import FastAPI, UploadFile, File
 from typing import List, Optional
 import urllib.parse
+from langchain.llms import HuggingFacePipeline
+from langchain import PromptTemplate, LLMChain
 
 app = FastAPI()
 
@@ -103,14 +105,20 @@ async def query(query: str, collection_name:str):
     retriever = db.as_retriever()
     # Prepare the LLM
     callbacks = [StreamingStdOutCallbackHandler()]
-    match model_type:
-        case "LlamaCpp":
-            llm = LlamaCpp(model_path=model_path, n_ctx=model_n_ctx, callbacks=callbacks, verbose=False)
-        case "GPT4All":
-            llm = GPT4All(model=model_path, n_ctx=model_n_ctx, backend='gptj', callbacks=callbacks, verbose=False)
-        case _default:
-            print(f"Model {model_type} not supported!")
-            exit;
+    model_id = 'lmsys/fastchat-t5-3b-v1.0'
+    llm = HuggingFacePipeline.from_model_id(
+        model_id=model_id,
+        task="text2text-generation",
+        model_kwargs={"temperature": 0, "max_length": 1000},
+    )
+    # match model_type:
+    #     case "LlamaCpp":
+    #         llm = LlamaCpp(model_path=model_path, n_ctx=model_n_ctx, callbacks=callbacks, verbose=False)
+    #     case "GPT4All":
+    #         llm = GPT4All(model=model_path, n_ctx=model_n_ctx, backend='gptj', callbacks=callbacks, verbose=False)
+    #     case _default:
+    #         print(f"Model {model_type} not supported!")
+    #         exit;
     qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents=True)
     
     # Get the answer from the chain

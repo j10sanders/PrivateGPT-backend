@@ -6,6 +6,7 @@ from typing import List
 import json
 import socket
 from urllib3.connection import HTTPConnection
+import time
 
 API_BASE_URL = os.environ.get("API_BASE_URL")
 
@@ -63,21 +64,25 @@ def get_collection_names():
 def retrieve_documents(query: str, collection_name: str):
     endpoint = f"{API_BASE_URL}/retrieve"
     data = {"query": query, "collection_name": collection_name}
+    start_time = time.time()
 
     # Modify socket options for the HTTPConnection class
     HTTPConnection.default_socket_options = (
         HTTPConnection.default_socket_options + [
             (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),
-            (socket.SOL_TCP, socket.TCP_KEEPIDLE, 45),
+            # (socket.SOL_TCP, socket.TCP_KEEPIDLE, 45),
             (socket.SOL_TCP, socket.TCP_KEEPINTVL, 10),
             (socket.SOL_TCP, socket.TCP_KEEPCNT, 6)
         ]
     )
     
     response = requests.post(endpoint, params=data)
+    end_time = time.time()
+    duration = end_time - start_time
+
     if response.status_code == 200:
         result = response.json()
-        st.subheader("Results")
+        st.subheader(f"Results: in {duration} seconds")
         st.text(result["results"])
         
         st.subheader("Documents")

@@ -25,7 +25,6 @@ from langchain.docstore.document import Document
 from constants import CHROMA_SETTINGS
 
 
-load_dotenv()
 
 
 # Map file extensions to document loaders and their arguments
@@ -46,7 +45,6 @@ LOADER_MAPPING = {
 }
 
 
-load_dotenv()
 
 
 def load_single_document(file_path: str) -> Document:
@@ -71,9 +69,9 @@ def load_documents(source_dir: str) -> List[Document]:
 
 def main(collection):
     # Load environment variables
-    persist_directory = os.environ.get('PERSIST_DIRECTORY')
+    persist_directory = 'db'
     source_directory = os.environ.get('SOURCE_DIRECTORY', 'source_documents')
-    embeddings_model_name = os.environ.get('EMBEDDINGS_MODEL_NAME')
+    embeddings_model_name = 'all-MiniLM-L6-v2'
     os.makedirs(source_directory, exist_ok=True)
     # Load documents and split in chunks
     print(f"Loading documents from {source_directory}")
